@@ -151,7 +151,7 @@ def decode_jpeg(image_buffer, scope=None):
     # Note that the resulting image contains an unknown height and width
     # that is set dynamically by decode_jpeg. In other words, the height
     # and width of image is unknown at compile-time.
-    image = tf.image.decode_jpeg(image_buffer, channels=3)
+    image = tf.image.decode_jpeg(image_buffer, channels=1)
 
     # After this point, all image pixels reside in [0,1)
     # until the very end, when they're rescaled to (-1, 1).  The various
@@ -194,7 +194,9 @@ def distort_color(image, thread_id=0, scope=None):
     return image
 
 
-def distort_image(image, height, width, bbox, thread_id=0, scope=None):
+def distort_image(image, height, width,
+                  bbox,
+                  thread_id=0, scope=None):
   """Distort one image for training a network.
 
   Distorting images provides a useful technique for augmenting the data
@@ -213,7 +215,9 @@ def distort_image(image, height, width, bbox, thread_id=0, scope=None):
   Returns:
     3-D float Tensor of distorted image used for training.
   """
-  with tf.op_scope([image, height, width, bbox], scope, 'distort_image'):
+  with tf.op_scope([image, height, width,
+                    bbox
+                    ], scope, 'distort_image'):
     # Each bounding box has shape [1, num_boxes, box coords] and
     # the coordinates are ordered [ymin, xmin, ymax, xmax].
 
@@ -245,7 +249,7 @@ def distort_image(image, height, width, bbox, thread_id=0, scope=None):
       tf.image_summary('images_with_distorted_bounding_box',
                        image_with_distorted_box)
 
-    # Crop the image to the specified bounding box.
+    # # Crop the image to the specified bounding box.
     distorted_image = tf.slice(image, bbox_begin, bbox_size)
 
     # This resizing operation may distort the images because the aspect
@@ -253,11 +257,11 @@ def distort_image(image, height, width, bbox, thread_id=0, scope=None):
     # fashion based on the thread number.
     # Note that ResizeMethod contains 4 enumerated resizing methods.
     resize_method = thread_id % 4
-    distorted_image = tf.image.resize_images(distorted_image, [height, width],
+    distorted_image = tf.image.resize_images(image, height, width,
                                              method=resize_method)
     # Restore the shape since the dynamic slice based upon the bbox_size loses
     # the third dimension.
-    distorted_image.set_shape([height, width, 3])
+    distorted_image.set_shape([height, width, 1])
     if not thread_id:
       tf.image_summary('cropped_resized_image',
                        tf.expand_dims(distorted_image, 0))
@@ -266,7 +270,7 @@ def distort_image(image, height, width, bbox, thread_id=0, scope=None):
     distorted_image = tf.image.random_flip_left_right(distorted_image)
 
     # Randomly distort the colors.
-    distorted_image = distort_color(distorted_image, thread_id)
+    # distorted_image = distort_color(distorted_image, thread_id)
 
     if not thread_id:
       tf.image_summary('final_distorted_image',
@@ -298,7 +302,8 @@ def eval_image(image, height, width, scope=None):
     return image
 
 
-def image_preprocessing(image_buffer, bbox, train, thread_id=0):
+def image_preprocessing(image_buffer, bbox,
+                        train, thread_id=0):
   """Decode and preprocess one image for evaluation or training.
 
   Args:
@@ -323,7 +328,8 @@ def image_preprocessing(image_buffer, bbox, train, thread_id=0):
   width = FLAGS.image_size
 
   if train:
-    image = distort_image(image, height, width, bbox, thread_id)
+   image = distort_image(image, height, width, bbox,
+                         thread_id)
   else:
     image = eval_image(image, height, width)
 
@@ -347,11 +353,11 @@ def parse_example_proto(example_serialized):
     image/class/label: 615
     image/class/synset: 'n03623198'
     image/class/text: 'knee pad'
-    image/object/bbox/xmin: 0.1
-    image/object/bbox/xmax: 0.9
-    image/object/bbox/ymin: 0.2
-    image/object/bbox/ymax: 0.6
-    image/object/bbox/label: 615
+    # image/object/bbox/xmin: 0.1
+    # image/object/bbox/xmax: 0.9
+    # image/object/bbox/ymin: 0.2
+    # image/object/bbox/ymax: 0.6
+    # image/object/bbox/label: 615
     image/format: 'JPEG'
     image/filename: 'ILSVRC2012_val_00041207.JPEG'
     image/encoded: <JPEG encoded string>
@@ -486,9 +492,13 @@ def batch_inputs(dataset, batch_size, train, num_preprocess_threads=None,
     images_and_labels = []
     for thread_id in range(num_preprocess_threads):
       # Parse a serialized Example proto to extract the image and metadata.
+      # image_buffer, label_index, bbox, _ = parse_example_proto(
+      #     example_serialized)
       image_buffer, label_index, bbox, _ = parse_example_proto(
           example_serialized)
-      image = image_preprocessing(image_buffer, bbox, train, thread_id)
+      image = image_preprocessing(image_buffer,
+                                  bbox,
+                                  train, thread_id)
       images_and_labels.append([image, label_index])
 
     images, label_index_batch = tf.train.batch_join(
@@ -499,7 +509,7 @@ def batch_inputs(dataset, batch_size, train, num_preprocess_threads=None,
     # Reshape images into these desired dimensions.
     height = FLAGS.image_size
     width = FLAGS.image_size
-    depth = 3
+    depth = 1
 
     images = tf.cast(images, tf.float32)
     images = tf.reshape(images, shape=[batch_size, height, width, depth])
