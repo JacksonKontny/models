@@ -20,6 +20,16 @@ py_library(
 )
 
 py_library(
+    name = "lidc_data",
+    srcs = [
+        "lidc_data.py",
+    ],
+    deps = [
+        ":dataset",
+    ],
+)
+
+py_library(
     name = "imagenet_data",
     srcs = [
         "imagenet_data.py",
@@ -88,6 +98,17 @@ py_library(
     deps = [
         ":image_processing",
         ":inception",
+    ],
+)
+
+py_binary(
+    name = "lidc_train",
+    srcs = [
+        "lidc_train.py",
+    ],
+    deps = [
+        ":lidc_data",
+        ":inception_train",
     ],
 )
 
@@ -178,6 +199,25 @@ py_binary(
     srcs = ["data/build_imagenet_data.py"],
 )
 
+
+sh_binary(
+    name = "preprocess_lidc",
+    srcs = ["data/preprocess_lidc.sh"],
+    data = [
+        "data/lidc_validation_labels.txt",
+        "data/lidc_labels.txt",
+        "data/lidc_annotations.txt",
+        "data/preprocess_lidc_data.py",
+        # "data/process_bounding_boxes.py",
+        ":build_lidc_data",
+    ],
+)
+
+py_binary(
+    name = "build_lidc_data",
+    srcs = ["data/build_lidc_data.py"],
+)
+
 filegroup(
     name = "srcs",
     srcs = glob(
@@ -186,6 +226,16 @@ filegroup(
             "BUILD",
         ],
     ),
+)
+
+filegroup(
+    name = "lidc_annotations",
+    srcs = [
+        # "data/imagenet_lsvrc_2015_synsets.txt",
+        "data/lidc_validation_labels.txt",
+        "data/lidc_annotations.txt",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 filegroup(
