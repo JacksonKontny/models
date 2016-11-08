@@ -102,15 +102,15 @@ py_library(
 )
 
 sh_binary(
-    name = "lidc_train",
-    srcs = ["data/train_lidc.sh"],
-    deps = [
-        ":lidc_train_py",
+    name = "lidc_train_bash",
+    srcs = ["data/lidc_train_bash.sh"],
+    data = [
+        ":lidc_train",
     ],
 )
 
 py_binary(
-    name = "lidc_train_py",
+    name = "lidc_train",
     srcs = [
         "lidc_train.py",
     ],
