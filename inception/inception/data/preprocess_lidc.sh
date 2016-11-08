@@ -18,7 +18,7 @@ set -e
 
 # Create the output and temporary directories.
 # DATA_DIR="${1%/}"
-DATA_DIR="/Users/jacksonkontny/Projects/DePaul/csc481/LIDC/"
+DATA_DIR="/Users/jacksonkontny/Projects/DePaul/csc481/"
 SCRATCH_DIR="${DATA_DIR}/raw_data/"
 mkdir -p "${DATA_DIR}"
 mkdir -p "${SCRATCH_DIR}"

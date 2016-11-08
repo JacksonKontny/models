@@ -15,18 +15,17 @@
 # ==============================================================================
 
 # Create the output and temporary directories.
-DATA_DIR="/Users/jacksonkontny/Projects/DePaul/csc481/LIDC/raw_data/"
-DATE_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
+DATA_DIR="/Users/jacksonkontny/Projects/DePaul/csc481/"
+DATE_TIME=`date '+%Y.%m.%d-%H.%M.%S'`
 TRAIN_DIR="${DATA_DIR}${DATE_TIME}-train"
 mkdir -p "${DATA_DIR}"
-mkdir -p "${SCRATCH_DIR}"
 mkdir -p "${TRAIN_DIR}"
 WORK_DIR="$0.runfiles/inception/inception"
 
-BUILD_SCRIPT="${WORK_DIR}/lidc_train_py"
+BUILD_SCRIPT="${WORK_DIR}/lidc_train"
 
 "${BUILD_SCRIPT}" \
   --num_gpus=1 \
   --batch_size=32 \
-  --train_dir="${TRAIN_DIR}"
+  --train_dir="${TRAIN_DIR}" \
   --data_dir="${DATA_DIR}"
