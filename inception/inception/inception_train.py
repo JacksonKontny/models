@@ -345,11 +345,11 @@ def train(dataset):
         print(format_str % (datetime.now(), step, loss_value,
                             examples_per_sec, duration))
 
-      if step % 100 == 0:
+      if step % 50 == 0:
         summary_str = sess.run(summary_op)
         summary_writer.add_summary(summary_str, step)
 
       # Save the model checkpoint periodically.
-      if step % 500 == 0 or (step + 1) == FLAGS.max_steps:
+      if step % 150 == 0 or (step + 1) == FLAGS.max_steps:
         checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
         saver.save(sess, checkpoint_path, global_step=step)
