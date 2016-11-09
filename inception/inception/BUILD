@@ -101,6 +101,17 @@ py_library(
     ],
 )
 
+py_binary(
+    name = "lidc_eval",
+    srcs = [
+        "lidc_eval.py",
+    ],
+    deps = [
+        ":lidc_data",
+        ":inception_eval",
+    ],
+)
+
 sh_binary(
     name = "lidc_train_bash",
     srcs = ["data/lidc_train_bash.sh"],
