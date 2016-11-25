@@ -18,20 +18,23 @@ set -e
 
 # Create the output and temporary directories.
 # DATA_DIR="${1%/}"
-DATA_DIR="/Users/jacksonkontny/Projects/DePaul/csc481/"
-SCRATCH_DIR="${DATA_DIR}/raw_data/"
+BASE_DIR="/Users/jacksonkontny/Projects/DePaul/csc481/"
+DATA_DIR="${BASE_DIR}/LIDC/LIDC_IDRI"
+PREPROCESSED_DIR="${DATA_DIR}/preprocessed_data/"
+PROCESSED_DIR="${DATA_DIR}/processed_data/"
 mkdir -p "${DATA_DIR}"
-mkdir -p "${SCRATCH_DIR}"
+mkdir -p "${PREPROCESSED_DIR}"
+mkdir -p "${PROCESSED_DIR}"
 WORK_DIR="$0.runfiles/inception/inception"
 
 # Note the locations of the train and validation data.
-TRAIN_DIRECTORY="${SCRATCH_DIR}train/"
-VALIDATION_DIRECTORY="${SCRATCH_DIR}validation/"
+TRAIN_DIRECTORY="${PREPROCESSED_DIR}train/"
+VALIDATION_DIRECTORY="${PREPROCESSED_DIR}validation/"
 LABELS_FILE="${WORK_DIR}/data/lidc_labels.txt"
 
 # Build the TFRecords version of the ImageNet data.
 BUILD_SCRIPT="${WORK_DIR}/build_lidc_data"
-OUTPUT_DIRECTORY="${DATA_DIR}"
+OUTPUT_DIRECTORY="${PROCESSED_DIR}"
 LIDC_METADATA_FILE="${WORK_DIR}/data/lidc_annotations.txt"
 
 "${BUILD_SCRIPT}" \
