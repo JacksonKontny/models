@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 from datetime import datetime
+from sklearn.metrics import confusion_matrix
 import math
 import os.path
 import time
@@ -52,7 +53,7 @@ tf.app.flags.DEFINE_string('subset', 'validation',
                            """Either 'validation' or 'train'.""")
 
 
-def _eval_once(saver, summary_writer, top_1_op, top_5_op, summary_op):
+def _eval_once(saver, summary_writer, top_1_op, top_5_op, summary_op, labels, logits):
   """Runs Eval once.
 
   Args:
@@ -100,10 +101,16 @@ def _eval_once(saver, summary_writer, top_1_op, top_5_op, summary_op):
 
       print('%s: starting evaluation on (%s).' % (datetime.now(), FLAGS.subset))
       start_time = time.time()
+      labels_arr = np.empty([0])
+      predictions_arr = np.empty([0])
       while step < num_iter and not coord.should_stop():
-        top_1, top_5 = sess.run([top_1_op, top_5_op])
-        count_top_1 += np.sum(top_1)
-        count_top_5 += np.sum(top_5)
+        # top_1, top_5 = sess.run([top_1_op, top_5_op])
+        # top_1 = sess.run([top_1_op])
+        # count_top_1 += np.sum(top_1)
+        # count_top_5 += np.sum(top_5)
+        labels_arr = np.append(labels_arr, labels.eval())
+        predictions = tf.argmax(logits, 1)
+        predictions_arr = np.append(predictions_arr, predictions.eval())
         step += 1
         if step % 20 == 0:
           duration = time.time() - start_time
@@ -115,15 +122,18 @@ def _eval_once(saver, summary_writer, top_1_op, top_5_op, summary_op):
           start_time = time.time()
 
       # Compute precision @ 1.
-      precision_at_1 = count_top_1 / total_sample_count
-      recall_at_5 = count_top_5 / total_sample_count
-      print('%s: precision @ 1 = %.4f recall @ 5 = %.4f [%d examples]' %
-            (datetime.now(), precision_at_1, recall_at_5, total_sample_count))
+      # precision_at_1 = count_top_1 / total_sample_count
+      # recall_at_5 = count_top_5 / total_sample_count
+      # print('%s: precision @ 1 = %.4f recall @ 5 = %.4f [%d examples]' %
+      #       # (datetime.now(), precision_at_1, recall_at_5, total_sample_count))
+      #       (datetime.now(), precision_at_1, 1.0, total_sample_count))
+      print("confusion matrix")
+      print(confusion_matrix(labels_arr, predictions_arr))
 
       summary = tf.Summary()
       summary.ParseFromString(sess.run(summary_op))
-      summary.value.add(tag='Precision @ 1', simple_value=precision_at_1)
-      summary.value.add(tag='Recall @ 5', simple_value=recall_at_5)
+      # summary.value.add(tag='Precision @ 1', simple_value=precision_at_1)
+      # summary.value.add(tag='Recall @ 5', simple_value=1.0)
       summary_writer.add_summary(summary, global_step)
 
     except Exception as e:  # pylint: disable=broad-except
@@ -151,6 +161,7 @@ def evaluate(dataset):
     top_1_op = tf.nn.in_top_k(logits, labels, 1)
     top_5_op = tf.nn.in_top_k(logits, labels, 5)
 
+
     # Restore the moving average version of the learned variables for eval.
     variable_averages = tf.train.ExponentialMovingAverage(
         inception.MOVING_AVERAGE_DECAY)
@@ -165,7 +176,7 @@ def evaluate(dataset):
                                             graph_def=graph_def)
 
     while True:
-      _eval_once(saver, summary_writer, top_1_op, top_5_op, summary_op)
+      _eval_once(saver, summary_writer, top_1_op, top_5_op, summary_op, labels, logits)
       if FLAGS.run_once:
         break
       time.sleep(FLAGS.eval_interval_secs)
