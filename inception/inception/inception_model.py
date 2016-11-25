@@ -122,16 +122,16 @@ def loss(logits, labels, batch_size=None):
                                     1.0, 0.0)
 
   # Cross entropy loss for the main softmax prediction.
-  slim.losses.cross_entropy_loss(logits[0],
+  slim.losses.class_weighted_cross_entropy_loss(logits[0],
                                  dense_labels,
                                  label_smoothing=0.1,
-                                 weight=1.0)
+                                 overall_weight=1.0)
 
   # Cross entropy loss for the auxiliary softmax head.
-  slim.losses.cross_entropy_loss(logits[1],
+  slim.losses.class_weighted_cross_entropy_loss(logits[1],
                                  dense_labels,
                                  label_smoothing=0.1,
-                                 weight=0.4,
+                                 overall_weight=0.4,
                                  scope='aux_loss')
 
 

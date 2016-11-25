@@ -172,3 +172,54 @@ def cross_entropy_loss(logits, one_hot_labels, label_smoothing=0,
     loss = tf.mul(weight, tf.reduce_mean(cross_entropy), name='value')
     tf.add_to_collection(LOSSES_COLLECTION, loss)
     return loss
+
+def class_weighted_cross_entropy_loss(logits, one_hot_labels, label_smoothing=0, scope=None, overall_weight=1.0):
+  """Define a Cross Entropy loss using softmax_cross_entropy_with_logits.
+
+  It can scale the loss by weight factor, and smooth the labels.
+
+  Args:
+    logits: [batch_size, num_classes] logits outputs of the network .
+    one_hot_labels: [batch_size, num_classes] target one_hot_encoded labels.
+    label_smoothing: if greater than 0 then smooth the labels.
+    weight: scale the loss by this factor.
+    scope: Optional scope for op_scope.
+
+  Returns:
+    A tensor with the softmax_cross_entropy loss.
+  """
+  logits.get_shape().assert_is_compatible_with(one_hot_labels.get_shape())
+  with tf.op_scope([logits, one_hot_labels], scope, 'CrossEntropyLoss'):
+    num_classes = one_hot_labels.get_shape()[-1].value
+    one_hot_labels = tf.cast(one_hot_labels, logits.dtype)
+    label_counts = tf.reduce_sum(one_hot_labels, 0)
+    batch_size = one_hot_labels.get_shape()[0].value
+
+    # Batch size should always be at least 1
+    batch_size = tf.constant(
+        max(1, min(batch_size, 32)),
+        dtype=label_counts.dtype.base_dtype
+    )
+
+    weight = tf.inv(tf.truediv(label_counts, batch_size))
+    # Class weights should be between 1 and the batch size (32)
+    class_weights = tf.clip_by_value(
+        tf.reduce_sum(tf.mul(one_hot_labels, weight), 1),
+        1.0, 32.0, name='class_weights'
+    )
+
+    if label_smoothing > 0:
+      smooth_positives = 1.0 - label_smoothing
+      smooth_negatives = label_smoothing / num_classes
+      one_hot_labels = one_hot_labels * smooth_positives + smooth_negatives
+    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits,
+                                                            one_hot_labels,
+                                                            name='xentropy')
+    loss = tf.reduce_mean(tf.mul(cross_entropy, class_weights))
+    # loss = tf.mul(weight, tf.reduce_mean(cross_entropy), name='value')
+    overall_weight = tf.convert_to_tensor(overall_weight,
+                                  dtype=logits.dtype.base_dtype,
+                                  name='loss_weight')
+    loss = tf.mul(overall_weight, loss, name='value')
+    tf.add_to_collection(LOSSES_COLLECTION, loss)
+    return loss
