@@ -15,7 +15,7 @@ PREPROCESSED_DATA_OUTPUT_PATH = sys.argv[3]
 
 CLASSIFICATION_TYPES = ['malignant', 'benign']
 TRAINING_SETS = ['train', 'validation']
-NUM_SAMPLES = 1000 # set to a number if you only want to get a small sample
+NUM_SAMPLES = 0 # set to a number if you only want to get a small sample
 
 
 def get_lidc_files():
@@ -57,10 +57,18 @@ def create_training_and_validation_sets(preprocessed_files, training_pct=.95):
 
 def process_lidc_files(lidc_files, conn):
     def process_file_set(data_set, data_set_name):
+        num_malignant = 0
+        num_benign = 0
         for lidc_file in data_set:
             dc = dicom.read_file(lidc_file , force=True)
             classification = get_classification(dc.SOPInstanceUID, conn)
             classification_dir = os.path.join(PREPROCESSED_DATA_OUTPUT_PATH, data_set_name, classification)
+            if classification == 'malignant':
+                num_malignant += 1
+            else:
+                if num_benign > num_malignant:
+                    continue
+                num_benign += 1
             px_array = dc.pixel_array
             out_file_name = '{}_{}.jpeg'.format(str(dc.PatientID), str(dc.InstanceNumber))
             out_file_path = os.path.join(classification_dir, out_file_name)

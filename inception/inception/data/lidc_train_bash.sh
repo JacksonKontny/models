@@ -16,7 +16,7 @@
 
 # Create the output and temporary directories.
 BASE_DIR="/Users/jacksonkontny/Projects/DePaul/csc481/LIDC/LIDC_IDRI/"
-DATA_DIR="${BASE_DIR}processed_data"
+DATA_DIR="${BASE_DIR}processed_data_even"
 DATE_TIME=`date '+%Y.%m.%d-%H.%M.%S'`
 TRAIN_DIR="${BASE_DIR}${DATE_TIME}-train"
 mkdir -p "${DATA_DIR}"
