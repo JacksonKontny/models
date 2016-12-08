@@ -16,26 +16,33 @@
 
 set -e
 
-# Create the output and temporary directories.
-# DATA_DIR="${1%/}"
-BASE_DIR="/Users/jacksonkontny/Projects/DePaul/csc481/"
-DATA_DIR="${BASE_DIR}/LIDC/LIDC_IDRI"
-PREPROCESSED_DIR="${DATA_DIR}/preprocessed_data/"
-PROCESSED_DIR="${DATA_DIR}/processed_data/"
-mkdir -p "${DATA_DIR}"
-mkdir -p "${PREPROCESSED_DIR}"
-mkdir -p "${PROCESSED_DIR}"
-WORK_DIR="$0.runfiles/inception/inception"
+BASE_DIR="${1%/}"
+EXPERIMENT_NAME="even_split"
+RAW_DATA_DIR="${BASE_DIR}/LIDC_IDRI"
+DB_FILENAME="${BASE_DIR}/sqlite_db/CT_norm_002.sql3"
+PREPROCESSED_DATA_OUTPUT_PATH="${BASE_DIR}/inception/${EXPERIMENT_NAME}/preprocessed_data/"
+PROCESSED_DATA_OUTPUT_PATH="${DATA_DIR}/inception/${EXPERIMENT_NAME}/processed_data/"
+mkdir -p "${PREPROCESSED_DATA_OUTPUT_PATH}"
+mkdir -p "${PROCESSED_DATA_OUTPUT_PATH}"
+WORK_DIR="$0.runfiles/inception/inception/"
+
+# Parse out trainig and validation records into labeled directories
+PREPROCESS_SCRIPT="${WORK_DIR}preprocess_lidc_data"
+
+"${PREPROCESS_SCRIPT}" \
+  "${RAW_DATA_DIR}" \
+  "${DB_FILENAME}" \
+  "${PREPROCESSED_DATA_OUTPUT_PATH}" \
 
 # Note the locations of the train and validation data.
-TRAIN_DIRECTORY="${PREPROCESSED_DIR}train/"
-VALIDATION_DIRECTORY="${PREPROCESSED_DIR}validation/"
-LABELS_FILE="${WORK_DIR}/data/lidc_labels.txt"
+TRAIN_DIRECTORY="${PREPROCESSED_DATA_OUTPUT_PATH}train/"
+VALIDATION_DIRECTORY="${PREPROCESSED_DATA_OUTPUT_PATH}validation/"
+LABELS_FILE="${WORK_DIR}data/lidc_labels.txt"
 
 # Build the TFRecords version of the ImageNet data.
-BUILD_SCRIPT="${WORK_DIR}/build_lidc_data"
-OUTPUT_DIRECTORY="${PROCESSED_DIR}"
-LIDC_METADATA_FILE="${WORK_DIR}/data/lidc_annotations.txt"
+BUILD_SCRIPT="${WORK_DIR}build_lidc_data"
+OUTPUT_DIRECTORY="${PROCESSED_DATA_OUTPUT_PATH}"
+LIDC_METADATA_FILE="${WORK_DIR}data/lidc_annotations.txt"
 
 "${BUILD_SCRIPT}" \
   --train_directory="${TRAIN_DIRECTORY}" \
