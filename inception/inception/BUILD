@@ -218,7 +218,6 @@ py_binary(
     srcs = ["data/build_imagenet_data.py"],
 )
 
-
 sh_binary(
     name = "preprocess_lidc",
     srcs = ["data/preprocess_lidc.sh"],
@@ -226,10 +225,15 @@ sh_binary(
         "data/lidc_validation_labels.txt",
         "data/lidc_labels.txt",
         "data/lidc_annotations.txt",
-        "data/preprocess_lidc_data.py",
         # "data/process_bounding_boxes.py",
+        ":preprocess_lidc_data",
         ":build_lidc_data",
     ],
+)
+
+py_binary(
+    name = "preprocess_lidc_data",
+    srcs = ["data/preprocess_lidc_data.py"],
 )
 
 py_binary(
