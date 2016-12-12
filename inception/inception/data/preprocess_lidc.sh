@@ -29,10 +29,13 @@ WORK_DIR="$0.runfiles/inception/inception/"
 # Parse out trainig and validation records into labeled directories
 PREPROCESS_SCRIPT="${WORK_DIR}preprocess_lidc_data"
 
-"${PREPROCESS_SCRIPT}" \
-  "${RAW_DATA_DIR}" \
-  "${DB_FILENAME}" \
-  "${PREPROCESSED_DATA_OUTPUT_PATH}" \
+if [${2}]
+then
+    "${PREPROCESS_SCRIPT}" \
+      "${RAW_DATA_DIR}" \
+      "${DB_FILENAME}" \
+      "${PREPROCESSED_DATA_OUTPUT_PATH}"
+fi
 
 # Note the locations of the train and validation data.
 TRAIN_DIRECTORY="${PREPROCESSED_DATA_OUTPUT_PATH}train/"
