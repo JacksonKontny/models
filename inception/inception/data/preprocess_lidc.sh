@@ -16,7 +16,6 @@
 
 set -e
 
-<<<<<<< c2614f69d88ee2370b50079a811fe6c9eee5974d
 BASE_DIR="${1%/}"
 EXPERIMENT_NAME="even_split"
 RAW_DATA_DIR="${BASE_DIR}/LIDC_IDRI"
@@ -37,18 +36,6 @@ then
       "${DB_FILENAME}" \
       "${PREPROCESSED_DATA_OUTPUT_PATH}"
 fi
-=======
-# Create the output and temporary directories.
-# DATA_DIR="${1%/}"
-BASE_DIR="/Users/jacksonkontny/Projects/DePaul/csc481/"
-DATA_DIR="${BASE_DIR}/LIDC/LIDC_IDRI"
-PREPROCESSED_DIR="${DATA_DIR}/preprocessed_data_even/"
-PROCESSED_DIR="${DATA_DIR}/processed_data_even/"
-mkdir -p "${DATA_DIR}"
-mkdir -p "${PREPROCESSED_DIR}"
-mkdir -p "${PROCESSED_DIR}"
-WORK_DIR="$0.runfiles/inception/inception"
->>>>>>> 0003_even working
 
 # Note the locations of the train and validation data.
 TRAIN_DIRECTORY="${PREPROCESSED_DATA_OUTPUT_PATH}train/"
