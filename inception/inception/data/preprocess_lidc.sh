@@ -17,7 +17,7 @@
 set -e
 
 BASE_DIR="${1%/}"
-EXPERIMENT_NAME="base"
+EXPERIMENT_NAME="even_split"
 RAW_DATA_DIR="${BASE_DIR}/LIDC_IDRI"
 DB_FILENAME="${BASE_DIR}/sqlite_db/CT_norm_002.sql3"
 PREPROCESSED_DATA_OUTPUT_PATH="${BASE_DIR}/inception/${EXPERIMENT_NAME}/preprocessed_data/"
