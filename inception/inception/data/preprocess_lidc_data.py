@@ -62,6 +62,12 @@ def process_lidc_files(lidc_files, conn):
         for lidc_file in data_set:
             dc = dicom.read_file(lidc_file , force=True)
             classification = get_classification(dc.SOPInstanceUID, conn)
+            if classification == 'malignant':
+                num_malignant += 1
+            else:
+                if num_benign > num_malignant:
+                    continue
+                num_benign += 1
             classification_dir = os.path.join(PREPROCESSED_DATA_OUTPUT_PATH, data_set_name, classification)
             if classification == 'malignant':
                 num_malignant += 1
