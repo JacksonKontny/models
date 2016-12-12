@@ -29,7 +29,7 @@ WORK_DIR="$0.runfiles/inception/inception/"
 # Parse out trainig and validation records into labeled directories
 PREPROCESS_SCRIPT="${WORK_DIR}preprocess_lidc_data"
 
-if [${2}]
+if [ $2 -gt 0 ]
 then
     "${PREPROCESS_SCRIPT}" \
       "${RAW_DATA_DIR}" \
