@@ -69,6 +69,12 @@ def process_lidc_files(lidc_files, conn):
                     continue
                 num_benign += 1
             classification_dir = os.path.join(PREPROCESSED_DATA_OUTPUT_PATH, data_set_name, classification)
+            if classification == 'malignant':
+                num_malignant += 1
+            else:
+                if num_benign > num_malignant:
+                    continue
+                num_benign += 1
             px_array = dc.pixel_array
             out_file_name = '{}_{}.jpeg'.format(str(dc.PatientID), str(dc.InstanceNumber))
             out_file_path = os.path.join(classification_dir, out_file_name)

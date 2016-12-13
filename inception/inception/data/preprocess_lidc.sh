@@ -17,11 +17,11 @@
 set -e
 
 BASE_DIR="${1%/}"
-EXPERIMENT_NAME="base"
+EXPERIMENT_NAME="even_split"
 RAW_DATA_DIR="${BASE_DIR}/LIDC_IDRI"
 DB_FILENAME="${BASE_DIR}/sqlite_db/CT_norm_002.sql3"
 PREPROCESSED_DATA_OUTPUT_PATH="${BASE_DIR}/inception/${EXPERIMENT_NAME}/preprocessed_data/"
-PROCESSED_DATA_OUTPUT_PATH="${DATA_DIR}/inception/${EXPERIMENT_NAME}/processed_data/"
+PROCESSED_DATA_OUTPUT_PATH="${BASE_DIR}/inception/${EXPERIMENT_NAME}/processed_data/"
 mkdir -p "${PREPROCESSED_DATA_OUTPUT_PATH}"
 mkdir -p "${PROCESSED_DATA_OUTPUT_PATH}"
 WORK_DIR="$0.runfiles/inception/inception/"
@@ -29,10 +29,13 @@ WORK_DIR="$0.runfiles/inception/inception/"
 # Parse out trainig and validation records into labeled directories
 PREPROCESS_SCRIPT="${WORK_DIR}preprocess_lidc_data"
 
-"${PREPROCESS_SCRIPT}" \
-  "${RAW_DATA_DIR}" \
-  "${DB_FILENAME}" \
-  "${PREPROCESSED_DATA_OUTPUT_PATH}" \
+if [ $2 -gt 0 ]
+then
+    "${PREPROCESS_SCRIPT}" \
+      "${RAW_DATA_DIR}" \
+      "${DB_FILENAME}" \
+      "${PREPROCESSED_DATA_OUTPUT_PATH}"
+fi
 
 # Note the locations of the train and validation data.
 TRAIN_DIRECTORY="${PREPROCESSED_DATA_OUTPUT_PATH}train/"
