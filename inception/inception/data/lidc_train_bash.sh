@@ -15,11 +15,13 @@
 # ==============================================================================
 
 # Create the output and temporary directories.
-BASE_DIR="/Users/jacksonkontny/Projects/DePaul/csc481/LIDC/LIDC_IDRI/"
-DATA_DIR="${BASE_DIR}processed_data"
+BASE_DIR="${1%/}"
+EXPERIMENT_NAME="base"
+EXPERIMENT_DIR="${BASE_DIR}/inception/${EXPERIMENT_NAME}"
+PROCESSED_DATA_PATH="${EXPERIMENT_DIR}/processed_data/"
 DATE_TIME=`date '+%Y.%m.%d-%H.%M.%S'`
-TRAIN_DIR="${BASE_DIR}${DATE_TIME}-train"
-mkdir -p "${DATA_DIR}"
+TRAIN_DIR="${EXPERIMENT_DIR}/${DATE_TIME}-train"
+
 mkdir -p "${TRAIN_DIR}"
 WORK_DIR="$0.runfiles/inception/inception"
 
