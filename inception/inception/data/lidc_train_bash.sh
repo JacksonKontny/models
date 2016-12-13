@@ -31,4 +31,4 @@ BUILD_SCRIPT="${WORK_DIR}/lidc_train"
   --num_gpus=1 \
   --batch_size=32 \
   --train_dir="${TRAIN_DIR}" \
-  --data_dir="${DATA_DIR}"
+  --data_dir="${PROCESSED_DATA_PATH}"
