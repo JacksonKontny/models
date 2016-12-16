@@ -37,9 +37,9 @@ class LidcData(Dataset):
     """Returns the number of examples in the data set."""
     # Bounding box data consists of 615299 bounding boxes for 544546 images.
     if self.subset == 'train':
-      return 10509
+      return 11664
     if self.subset == 'validation':
-      return 563
+      return 0
 
   def download_message(self):
     """Instruction to download and extract the tarball from Flowers website."""
